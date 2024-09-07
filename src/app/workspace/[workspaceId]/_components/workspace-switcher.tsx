@@ -25,8 +25,8 @@ export const WorkspaceSwitcher = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <div className="bg-[#ABABAD] hover:bg-[#ABABAD]/80 rounded-md flex items-center justify-center text-xl text-slate-800 font-semibold size-9 overflow-hidden relative">
+      <DropdownMenuTrigger asChild>
+        <Button className="bg-[#ABABAD] hover:bg-[#ABABAD]/80 rounded-md flex items-center justify-center text-xl text-slate-800 font-semibold size-9 overflow-hidden relative">
           {workspaceLoading ? 
             (
               <Loader className="size-4 animate-spin shrink-0"/>
@@ -36,7 +36,7 @@ export const WorkspaceSwitcher = () => {
               </div>
             )
           }
-        </div>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem className="cursor-pointer flex flex-col items-start justify-start capitalize" onClick={() => router.push(`/workspace/${workspaceId}`)}>
