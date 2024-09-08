@@ -3,7 +3,7 @@ import { api } from "../../../../convex/_generated/api";
 import { useMutation } from "convex/react";
 import { Id } from "../../../../convex/_generated/dataModel";
 
-type RequestType = { workspaceName: string};
+type RequestType = { id: Id<"workspaces">};
 type ResponseType = Id<"workspaces"> | null;
 type Options = {
   onSuccess?: (response: ResponseType) => void;
@@ -12,8 +12,8 @@ type Options = {
   throwError?: boolean;
 }
 
-export const useCreateWorkspace = () => {
-  const mutation = useMutation(api.workspaces.create);
+export const useRemoveWorkspace = () => {
+  const mutation = useMutation(api.workspaces.remove);
   const [data, setData] = useState<ResponseType>(null);
   const [error, setError] = useState<Error | null>(null);
 
@@ -32,7 +32,7 @@ export const useCreateWorkspace = () => {
 
         const response = await mutation(values);
         options?.onSuccess?.(response as ResponseType);
-        return response;
+        return response as ResponseType;
       } catch (error) {
         setStatus("error");
         options?.onError?.(error as Error);
