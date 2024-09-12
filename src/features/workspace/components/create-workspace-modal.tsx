@@ -43,6 +43,7 @@ export const CreateWorkspaceModal = () => {
         <form className='space-y-4' onSubmit={handleSubmit}>
           <Input 
             autoFocus
+            required
             value={workspaceName}
             onChange={(e)=> setWorkspaceName(e.target.value)}
             disabled={isPending}

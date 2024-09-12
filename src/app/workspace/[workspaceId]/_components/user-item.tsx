@@ -46,7 +46,7 @@ export const UserItem = ({
         <Avatar className="size-5 rounded-md mr-1">
           <AvatarImage src={image} className="rounded-md"/>
           <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
-            {label}
+            {icon}
           </AvatarFallback>
         </Avatar>
         <span className="text-sm truncate">

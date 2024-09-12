@@ -107,4 +107,77 @@ export const remove = mutation({
 
     return args.id;
   }
-})
+});
+
+export const newJoinCode = mutation({
+  args: { workspaceId: v.id("workspaces") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if(!userId) {
+      return new Error("Unauthorized");
+    }
+    const workspace = await ctx.db.get(args.workspaceId);
+    if(!workspace) {
+      return new Error("Workspace not found");
+    }
+    const member = await ctx.db.query("members").withIndex("By_workspace_id_user_id", (q) => 
+      q.eq("workspaceId", args.workspaceId).eq("userId", userId)
+    ).unique();
+    if(!member || member.role !== "admin") {
+      return new Error("Unauthorized");
+    }
+    await ctx.db.patch(args.workspaceId, {
+      joinId: generateCode()
+    });
+    return args.workspaceId;
+  },
+});
+
+export const join = mutation({
+  args: { workspaceId: v.id("workspaces"), joinCode: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if(!userId) {
+      return new Error("Unauthorized");
+    }
+    const workspace = await ctx.db.get(args.workspaceId);
+    if(!workspace) {
+      return new Error("Workspace not found");
+    }
+    const member = await ctx.db.query("members").withIndex("By_workspace_id_user_id", (q) => 
+      q.eq("workspaceId", args.workspaceId).eq("userId", userId)
+    ).unique();
+    if(member) {
+      return new Error("Already a member of this workspace");
+    }
+    if(workspace.joinId !== args.joinCode.toLowerCase()) {
+      return new Error("Invalid join code");
+    }
+    await ctx.db.insert("members", {
+      userId,
+      workspaceId: args.workspaceId,
+      role: "member"
+    });
+    return args.workspaceId;
+  },
+});
+
+export const getInfoById = query({
+  args: { id: v.id("workspaces") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if(!userId) {
+      return null;
+    }
+    const member = await ctx.db.query("members").withIndex("By_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId)).unique();
+    
+    const workspace = await ctx.db.get(args.id);
+    if(!workspace) {
+      return null;
+    }
+    return { 
+      name: workspace.name,
+      isMember: !!member
+    };
+  }
+});
