@@ -5,13 +5,14 @@ import { useChannelId } from "@/hooks/use-channel-id";
 import { AlertTriangle, Loader } from "lucide-react";
 import { Header } from "./_components/header";
 import { ChatInput } from "./_components/chat-input";
+import { useGetMessage } from "@/features/message/api/use-get-message";
 
 
 const ChannelIdPage = () => {
   const channelId = useChannelId();
   const { data: channel, isLoading: channelLoading } = useGetChannel({ id: channelId });
-
-
+  const { results } = useGetMessage({ channelId });
+  console.log(results);
   if(channelLoading) {
     return (
       <div className="h-full flex items-center justify-center flex-1">
