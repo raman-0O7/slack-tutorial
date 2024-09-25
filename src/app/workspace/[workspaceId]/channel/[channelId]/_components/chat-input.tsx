@@ -44,7 +44,6 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
         if(!url) {
           throw new Error("Failed to generate upload url");
         }
-        console.log(url)
         const result = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": image.type },
@@ -59,20 +58,20 @@ export const ChatInput = ({ placeholder }: ChatInputProps) => {
         values.image = storageId;
       }
       createMessage(values, { throwError: true });
+      editorRef?.current?.setContents(JSON.parse("{}"));
 
     } catch (e) {
       toast.error("Failed to send message");
     } finally {
       setIsPending(false);
       editorRef?.current?.enable(true);
-
-      setEditorKey(prevKey => prevKey + 1); 
+      editorRef?.current?.focus();
+      // setEditorKey(prevKey => prevKey + 1); 
     }
   }
   return (
     <div className="px-5 w-full">
       <Editor
-        key={editorKey}
         placeholder={placeholder}
         onSubmit={handleSubmit}
         innerRef={editorRef}

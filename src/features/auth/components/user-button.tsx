@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuConten
 import { useCurrentUser } from "../api/use-current-user";
 import { Loader, LogOut } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { redirect } from "next/navigation";
 
 type Props = {
  
@@ -32,7 +33,13 @@ export const UserButton = ({}: Props) => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" side="right" className="w-60">
-        <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => {
+            signOut()
+            redirect("/auth")
+          }}
+          className="cursor-pointer"
+        >
           <LogOut className="size-4 mr-2"/>
           {"Logout"}
         </DropdownMenuItem>

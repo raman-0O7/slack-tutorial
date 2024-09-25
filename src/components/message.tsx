@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRemoveMessage } from "@/features/message/api/use-remove-message";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useToggleReaction } from "@/features/reaction/api/use-toggle-reaction";
+import { Reactions } from "./reactions";
+import { usePanel } from "@/hooks/use-panel";
 
 const Renderer = dynamic(()  => import("@/components/renderer"), { ssr: false });
 const Editor = dynamic(()  => import("@/components/editor"), { ssr: false });
@@ -60,13 +63,23 @@ function formatFullTime(date: Date) {
   threadImage,
   threadTimestamp
 }: MessageProps) => {
+  const { parentMessageId, onOpenMessage, onClose } = usePanel();
   const [ConfirmDialog, confirm] = useConfirm({
     title: "Delete Message",
     message: "Are you sure you want to delete this message? This action is irreversible.",
   })
   const { mutate: updateMessage, isPending: isUpdateMessage } = useUpdateMessage();
   const { mutate: removeMessage, isPending: isRemovingMessage } = useRemoveMessage();
+  const { mutate: toggleReaction, isPending: isTogglingReaction } = useToggleReaction();
   const isPending = isUpdateMessage;
+
+  async function handleReaction(value: string) {
+    toggleReaction({ messageId: id, value }, {
+      onError: () => {
+        toast.error("Failed to add reaction")
+      }
+    });
+  }
   async function handleRemove() {
     const ok = await confirm();
     if(!ok) return;
@@ -74,7 +87,9 @@ function formatFullTime(date: Date) {
       onSuccess: () => {
         toast.success("Message Deleted")
 
-        //TODO: Remove opened threads
+        if(parentMessageId === id) {
+          onClose();
+        }
       },
       onError: () => {
         toast.error("Failed to delete message")
@@ -124,6 +139,7 @@ function formatFullTime(date: Date) {
                 {updatedAt && (
                   <span className="text-xs text-muted-foreground">(edited)</span>
                 )}
+                <Reactions data={reactions} onChange={handleReaction} />
               </div>
             )}
           </div>
@@ -132,9 +148,9 @@ function formatFullTime(date: Date) {
             isAuthor={isAuthor}
             isPending={isPending}
             handleEdit={() => setEdittingId(id)}
-            handleThread={() => {}}
+            handleThread={() => onOpenMessage(id)}
             handleDelete={handleRemove}
-            handleReaction={() => {}}
+            handleReaction={handleReaction}
             hideThreadButton={hideThreadButton}
           />
         )}
@@ -190,6 +206,7 @@ function formatFullTime(date: Date) {
               {updatedAt && (
                 <span className="text-xs text-muted-foreground">(edited)</span>
               )}
+              <Reactions data={reactions} onChange={handleReaction} />
             </div>
           )}
         </div>
@@ -198,9 +215,9 @@ function formatFullTime(date: Date) {
             isAuthor={isAuthor}
             isPending={isPending}
             handleEdit={() => setEdittingId(id)}
-            handleThread={() => {}}
+            handleThread={() => onOpenMessage(id)}
             handleDelete={handleRemove}
-            handleReaction={() => {}}
+            handleReaction={handleReaction}
             hideThreadButton={hideThreadButton}
           />
         )}

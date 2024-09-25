@@ -5,14 +5,14 @@ import { useChannelId } from "@/hooks/use-channel-id";
 import { AlertTriangle, Loader } from "lucide-react";
 import { Header } from "./_components/header";
 import { ChatInput } from "./_components/chat-input";
-import { useGetMessage } from "@/features/message/api/use-get-message";
+import { useGetMessages } from "@/features/message/api/use-get-messages";
 import { MessageList } from "@/components/message-list";
 
 
 const ChannelIdPage = () => {
   const channelId = useChannelId();
   const { data: channel, isLoading: channelLoading } = useGetChannel({ id: channelId });
-  const { results, status, loadMore } = useGetMessage({ channelId });
+  const { results, status, loadMore } = useGetMessages({ channelId });
   if(channelLoading || status === "LoadingFirstPage") {
     return (
       <div className="h-full flex items-center justify-center flex-1">
